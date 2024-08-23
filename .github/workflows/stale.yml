@@ -1,0 +1,51 @@
+# This workflow warns and then closes issues and PRs that have had no activity for a specified amount of time.
+#
+# You can adjust the behavior by modifying this file.
+# For more information, see:
+# https://github.com/actions/stale
+name: Mark stale issues and pull requests
+
+on:
+  schedule:
+  - cron: '15 7 * * *'
+
+jobs:
+  stale:
+
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+
+    steps:
+    - uses: actions/stale@v5
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        stale-issue-message: 'Stale issue message'
+        stale-pr-message: 'Stale pull request message'
+        stale-issue-label: 'no-issue-activity'
+        stale-pr-label: 'no-pr-activity'
+            - name: StackQL Studios - StackQL Assert
+  # You may pin to the exact commit or the version.
+  # uses: stackql/stackql-assert@457ac316225c23320b6fbf892fd586dd752aa1fa
+  uses: stackql/stackql-assert@v1.3.2
+  with:
+    # stackql query to execute (need to supply either test_query or test_query_file_path)
+    test_query: # optional
+    # stackql query file to execute (need to supply either test_query or test_query_file_path)
+    test_query_file_path: # optional
+    # path to data file to pass to the stackql query preprocessor (json or jsonnet file)
+    data_file_path: # optional
+    # comma delimited list of variables to pass to the stackql query preprocessor (supported with jsonnet config blocks or jsonnet data files only), accepts 'var1=val1,var2=val2', can be used to source environment variables into stackql queries
+    vars: # optional
+    # expected number of rows from executing test query
+    expected_rows: # optional
+    # expected result (as a json string) from executing test query, overrides expected_results_file_path
+    expected_results_str: # optional
+    # json file with the expected result
+    expected_results_file_path: # optional
+    # the path of json file that stores stackql AUTH string (only required when using non-standard environment variable names)
+    auth_obj_path: # optional
+    # stackql AUTH string (only required when using non-standard environment variable names)
+    auth_str: # optional
+          
