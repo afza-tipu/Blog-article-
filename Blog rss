@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Feed</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        #blog-feed {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        #blog-feed div {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #blog-feed h3 {
+            margin: 0;
+            font-size: 1.5em;
+            color: #333;
+        }
+
+        #blog-feed p {
+            color: #666;
+        }
+
+        #blog-feed a {
+            text-decoration: none;
+            color: #007BFF;
+        }
+
+        #blog-feed a:hover {
+            text-decoration: underline;
+            color: #0056b3;
+        }
+
+        .pagination {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .pagination button {
+            margin: 0 5px;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+        }
+
+        .pagination button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div id="blog-feed"></div>
+    <div class="pagination">
+        <button id="prev-page" disabled>Previous</button>
+        <button id="next-page">Next</button>
+    </div>
+
+    <script>
+        const rssUrl = 'https://advafzal.blogspot.com/feeds/posts/default';
+        const itemsPerPage = 5;
+        let currentPage = 0;
+        let items = [];
+
+        async function fetchFeed() {
+            const response = await fetch(rssUrl);
+            const text = await response.text();
+            const parser = new DOMParser();
+            const xml = parser.parseFromString(text, 'text/xml');
+            items = Array.from(xml.querySelectorAll('item'));
+            displayItems();
+        }
+
+        function displayItems() {
+            const feedContainer = document.getElementById('blog-feed');
+            feedContainer.innerHTML = ''; // Clear previous items
+
+            const startIndex = currentPage * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const paginatedItems = items.slice(startIndex, endIndex);
+
+            paginatedItems.forEach(item => {
+                const title = item.querySelector('title').textContent;
+                const link = item.querySelector('link').textContent;
+                const description = item.querySelector('description').textContent;
+
+                const feedItem = document.createElement('div');
+                feedItem.innerHTML = `<h3><a href="${link}" target="_blank">${title}</a></h3><p>${description}</p>`;
+                feedContainer.appendChild(feedItem);
+            });
+
+            updatePaginationButtons();
+        }
+
+        function updatePaginationButtons() {
+            document.getElementById('prev-page').disabled = currentPage === 0;
+            document.getElementById('next-page').disabled = (currentPage + 1) * itemsPerPage >= items.length;
+        }
+
+        document.getElementById('prev-page').addEventListener('click', () => {
+            if (currentPage > 0) {
+                currentPage--;
+                displayItems();
+            }
+        });
+
+        document.getElementById('next-page').addEventListener('click', () => {
+            if ((currentPage + 1) * itemsPerPage < items.length) {
+                currentPage++;
+                displayItems();
+            }
+        });
+
+        fetchFeed();
+    </script>
+</body>
+</html>
